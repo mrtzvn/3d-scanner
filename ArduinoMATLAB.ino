@@ -1,5 +1,5 @@
 
-const int inputPin = A5;
+const int inputPin = A4;
 
 const int sampleSize = 10;
 
@@ -15,7 +15,6 @@ int iBC = 0;
 
 void setup(){
   Serial.begin(115200);
-  
   pinMode(dPin1,OUTPUT);
   pinMode(dPin2,OUTPUT);
   pinMode(sPin1,OUTPUT);
@@ -46,20 +45,21 @@ void loop(){
           digitalWrite(dPin1,HIGH);
           for(int i = 0; i < 200 ; i++){
             digitalWrite(sPin1,HIGH);
-            delayMicroseconds(1500);
+            delayMicroseconds(3000);
             digitalWrite(sPin1,LOW);
-            delayMicroseconds(1500);
+            delayMicroseconds(3000);
             analogValue[i] = getAnalogValue(sampleSize);
-            delay(1);
+            //delay(1);
             }
           isDataTransmitted = false;
           }
         else{
           while(Serial.available()){
             incomingByte = Serial.read();
-            for(int i = 0 ; i < 200 ; i++){
+            /*for(int i = 0 ; i < 200 ; i++){
               Serial.print(analogValue[i]);
-            }
+            }*/
+            Serial.println(); //debug
             isDataTransmitted = true;
         }
         }
@@ -89,17 +89,32 @@ void rotateBase(){
       }
 }
 
-char getAnalogValue(int sampleSize){
+int getAnalogValue(int sampleSize){
   int sLimit = 160;
   int arr[10];
   for(int i = 0; i < sampleSize ; i++){
      arr[i] = analogRead(inputPin);
      delay(1);
   }
-   sortArray(arr,sampleSize);
-   if(arr[sampleSize/2 - 1] < sLimit) return sLimit;
-   return arr[sampleSize/2 - 1];
-  
+   //sortArray(arr,sampleSize);
+   /*if(arr[sampleSize/2 - 1] < sLimit) {
+    Serial.print(sLimit); //debug
+    Serial.print(",!"); //debug
+    return sLimit;
+   }*/
+   int tmpSum = 0;
+   int count = 0;
+   for(int i = 0; i < sampleSize; i++) {
+    if(arr[i] != 0){
+      tmpSum = tmpSum + arr[i];
+      count++;
+    }
+   }
+   //Serial.print(arr[sampleSize/2 - 1]); //debug
+   Serial.print(tmpSum/count);
+   Serial.print(','); //debug
+   //return arr[sampleSize/2 - 1];
+  return tmpSum/count;
 }
 void sortArray(int arr[],int lenght){
   float tmp;
